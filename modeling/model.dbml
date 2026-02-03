@@ -1,0 +1,236 @@
+Table "dim_player" {
+  "player_id" int [pk]
+  "first_name" varchar(500)
+  "last_name" varchar(500)
+  "name" varchar(500)
+  "player_code" varchar(500)
+  "country_of_birth" varchar(500)
+  "city_of_birth" varchar(500)
+  "country_of_citizenship" varchar(500)
+  "date_of_birth" datetime
+  "position" varchar(500)
+  "sub_position" varchar(500)
+  "foot" varchar(500)
+  "height_in_cm" int
+  "agent_name" varchar(500)
+  "image_url" varchar(500)
+  "url" varchar(500)
+
+  Indexes {
+    position [name: "idx_players_position"]
+    country_of_citizenship [name: "idx_players_country_of_citizenship"]
+  }
+}
+
+Table "dim_club" {
+  "club_id" int [pk]
+  "club_code" varchar(500)
+  "name" varchar(500)
+  "domestic_competition_id" varchar(500)
+  "domestic_competition_name" varchar(500)
+  "stadium_name" varchar(500)
+  "stadium_seats" int
+  "url" varchar(500)
+
+  Indexes {
+    domestic_competition_id [name: "idx_clubs_domestic_competition_id"]
+    name [name: "idx_clubs_name"]
+  }
+}
+
+Table "dim_competition" {
+  "competition_id" varchar(500) [pk]
+  "competition_code" varchar(500)
+  "name" varchar(500)
+  "sub_type" varchar(500)
+  "type" varchar(500)
+  "country_id" int
+  "country_name" varchar(500)
+  "domestic_league_code" varchar(500)
+  "confederation" varchar(500)
+  "url" varchar(500)
+  "is_major_national_league" boolean
+
+  Indexes {
+    country_id [name: "idx_competitions_country_id"]
+    type [name: "idx_competitions_type"]
+    confederation [name: "idx_competitions_confederation"]
+  }
+}
+
+Table "fact_games" {
+  "game_id" int [pk, ref: < "dim_game_details"."game_id"]
+  "competition_id" varchar(500) [ref: < "dim_competition"."competition_id"]
+  "date" date
+  "home_club_id" int [ref: < "dim_club"."club_id"]
+  "away_club_id" int [ref: < "dim_club"."club_id"]
+  "home_club_goals" int
+  "away_club_goals" int
+  "home_club_position" int
+  "away_club_position" int
+  "attendance" int
+
+  Indexes {
+    competition_id [name: "idx_fact_games_competition_id"]
+    date [name: "idx_fact_games_date"]
+    home_club_id [name: "idx_fact_games_home_club_id"]
+    away_club_id [name: "idx_fact_games_away_club_id"]
+  }
+}
+
+Table "dim_game_details" {
+  "game_id" int [pk, not null]
+  "season" int
+  "round" varchar(500)
+  "stadium" varchar(500)
+  "referee" varchar(500)
+  "home_club_manager_name" varchar(500)
+  "away_club_manager_name" varchar(500)
+  "aggregate" varchar(500)
+  "competition_type" varchar(500)
+  "url" varchar(500)
+  "away_club_formation" varchar(500)
+  "home_club_formation" varchar(500)
+  "date" bigint
+
+  Indexes {
+    season [name: "idx_dim_game_details_season"]
+    stadium [name: "idx_dim_game_details_stadium"]
+    referee [name: "idx_dim_game_details_referee"]
+  }
+}
+
+Table "fact_appearances" {
+  "appearance_id" varchar(500) [pk]
+  "game_id" int [ref: < "dim_game_details"."game_id"]
+  "player_id" int [ref: < "dim_player"."player_id"]
+  "player_club_id" int [ref: < "dim_club"."club_id"]
+  "player_current_club_id" int [ref: < "dim_club"."club_id"]
+  "date" date
+  "competition_id" varchar(500) [ref: < "dim_competition"."competition_id"]
+  "yellow_cards" int
+  "red_cards" int
+  "goals" int
+  "assists" int
+  "minutes_played" int
+
+  Indexes {
+    game_id [name: "idx_appearances_game_id"]
+    player_id [name: "idx_appearances_player_id"]
+    player_club_id [name: "idx_appearances_player_club_id"]
+    date [name: "idx_appearances_date"]
+    competition_id [name: "idx_appearances_competition_id"]
+  }
+}
+
+Table "fact_club_games" {
+  "game_id" int [ref: < "dim_game_details"."game_id"]
+  "club_id" int [ref: < "dim_club"."club_id"]
+  "opponent_id" int [ref: < "dim_club"."club_id"]
+  "own_goals" int
+  "own_position" int
+  "opponent_goals" int
+  "opponent_position" int
+  "is_win" boolean
+  "own_manager_name" varchar(500)
+  "opponent_manager_name" varchar(500)
+  "hosting" varchar(500)
+
+  Indexes {
+    (game_id, club_id) [pk, name: "pk_club_games_game_id_club_id"]
+    club_id [name: "idx_club_games_club_id"]
+    opponent_id [name: "idx_club_games_opponent_id"]
+  }
+}
+
+Table "fact_game_events" {
+  "game_event_id" varchar(500) [pk]
+  "date" date
+  "game_id" int [ref: < "dim_game_details"."game_id"]
+  "player_id" int [ref: < "dim_player"."player_id"]
+  "club_id" int [ref: < "dim_club"."club_id"]
+  "player_in_id" int [ref: < "dim_player"."player_id"]
+  "player_assist_id" int [ref: < "dim_player"."player_id"]
+  "minute" int
+  "type" varchar(500)
+  "description" varchar(500)
+
+  Indexes {
+    game_id [name: "idx_game_events_game_id"]
+    player_id [name: "idx_game_events_player_id"]
+    type [name: "idx_game_events_type"]
+    date [name: "idx_game_events_date"]
+  }
+}
+
+Table "fact_game_lineups" {
+  "lineup_id" varchar(500) [pk]
+  "date" date
+  "game_id" int [ref: < "dim_game_details"."game_id"]
+  "player_id" int [ref: < "dim_player"."player_id"]
+  "club_id" int [ref: < "dim_club"."club_id"]
+  "lineup_type" varchar(500)
+  "position" varchar(500)
+  "jersey_number" int
+  "is_captain" boolean
+
+  Indexes {
+    game_id [name: "idx_game_lineups_game_id"]
+    player_id [name: "idx_game_lineups_player_id"]
+    club_id [name: "idx_game_lineups_club_id"]
+    lineup_type [name: "idx_game_lineups_type"]
+  }
+}
+
+Table "fact_player_valuations" {
+  "player_id" int [ref: < "dim_player"."player_id"]
+  "date" date
+  "current_club_id" int [ref: < "dim_club"."club_id"]
+  "player_club_domestic_competition_id" varchar(500) [ref: < "dim_competition"."competition_id"]
+  "market_value_in_eur" decimal
+
+  Indexes {
+    (player_id, date) [pk, name: "pk_player_valuations_player_id_date"]
+    player_id [name: "idx_player_valuations_player_id"]
+    date [name: "idx_player_valuations_date"]
+    current_club_id [name: "idx_player_valuations_current_club_id"]
+  }
+}
+
+Table "fact_transfers" {
+  "player_id" int [ref: < "dim_player"."player_id"]
+  "transfer_date" date
+  "from_club_id" int [ref: < "dim_club"."club_id"]
+  "to_club_id" int [ref: < "dim_club"."club_id"]
+  "transfer_season" varchar(500)
+  "transfer_fee" decimal
+  "market_value_in_eur" decimal
+
+  Indexes {
+    (player_id, transfer_date) [pk, name: "pk_transfers_player_id_transfer_date"]
+    player_id [name: "idx_transfers_player_id"]
+    transfer_date [name: "idx_transfers_transfer_date"]
+    from_club_id [name: "idx_transfers_from_club_id"]
+    to_club_id [name: "idx_transfers_to_club_id"]
+    transfer_season [name: "idx_transfers_transfer_season"]
+  }
+}
+
+Table "fact_club_snapshot" {
+  "club_id" int [ref: < "dim_club"."club_id"]
+  "snapshot_date" date
+  "total_market_value" decimal
+  "squad_size" int
+  "average_age" decimal
+  "foreigners_number" int
+  "foreigners_percentage" decimal
+  "national_team_players" int
+  "net_transfer_record" varchar(500)
+  "coach_name" varchar(500)
+
+  Indexes {
+    (club_id, snapshot_date) [pk, name: "pk_club_snapshot_club_id_date"]
+    club_id [name: "idx_club_snapshot_club_id"]
+    snapshot_date [name: "idx_club_snapshot_date"]
+  }
+}
