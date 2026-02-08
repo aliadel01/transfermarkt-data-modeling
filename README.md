@@ -1,57 +1,87 @@
-# TransferMarket Data Modeling Project
+# TransferMarkt Data Warehouse - ETL & Benchmark Project
 
-A comprehensive data engineering project that transforms TransferMarket dataset into a star schema and evaluates different storage formats (CSV, Avro, Parquet) on HDFS.
+<img src="https://img.shields.io/badge/Databricks-Serverless-FF3621?logo=databricks" alt="Databricks">
+<img src="https://img.shields.io/badge/Apache Spark-3.x-E25A1C?logo=apache-spark" alt="Apache Spark">
+<img src="https://img.shields.io/badge/Python-3.x-3776AB?logo=python" alt="Python"> <img src="https://img.shields.io/badge/Snowflake-Data%20Warehouse-0099FF?logo=snowflake" alt="Snowflake">
 
-## 📋 Project Overview
+A comprehensive data engineering project that transforms the TransferMarkt football dataset into a star schema **data warehouse** and performs extensive **benchmarking** of storage formats (CSV, Avro, Parquet) with various compression algorithms on **Databricks** Unity Catalog.
 
-This project models football transfer market data into a star schema and implements it on HDFS in multiple file formats. It includes performance benchmarking across different formats and compression algorithms.
+## 📊 Project Overview
 
-## Data Modeling
+This project demonstrates end-to-end data warehousing best practices:
+
+- **Data Modeling**: Star schema with 4 dimensions and 8 fact tables
+- **ETL Pipeline**: PySpark-based transformation from raw CSV to dimensional model
+- **Performance Benchmarking**: Comprehensive analysis of:
+  - Storage formats (CSV, Avro, Parquet)
+  - Compression algorithms (Snappy, Gzip, LZ4, ZSTD, Bzip2, Deflate)
+  - Write/Read performance metrics
+- **Production-Ready DDL**: Snowflake-compatible SQL schemas with clustering keys
+
+
+## Data Model
+
 ![](modeling/model.jpeg)
 
-## Project Reference
-- [Project Task & Requirements](https://github.com/ahmedshaaban1999/Data_Engineering_Mentorship/tree/main/level_1/Data_Modeling/projects/transferMarket)
-- [TransferMarket Dataset](https://www.kaggle.com/datasets/davidcariboo/player-scores) from Kaggle - Contains player transfers, valuations, and related football market data.
+### Technology Stack
 
-## 🎯 Objectives
-1. Design and implement a star schema for TransferMarket data
-2. Load data into HDFS in CSV, Avro, and Parquet formats
-3. Benchmark storage size, write speed, and read speed
-4. Evaluate multiple compression algorithms and levels
-
-## 🛠️ Technologies
-
-- **Storage**: HDFS (Hadoop Distributed File System)
-- **Formats**: CSV, Avro, Parquet
-- **Compression**: Snappy, Gzip, LZO (and others)
-- **Processing**: Apache Spark / Python
+- **Platform**: Databricks Serverless + Unity Catalog
+- **Processing**: Apache Spark 3.x (PySpark)
+- **Storage**: Unity Catalog Volumes
+- **Visualization**: Matplotlib, Seaborn
+- **Target Warehouse**: Snowflake (DDL included)
 
 
-
-## 📦 Deliverables
-
-1. **Star Schema Design** - Dimensional model with fact and dimension tables
-2. **Performance Comparison Report** - Detailed analysis of:
-   - File sizes across formats
-   - Write performance metrics
-   - Read performance metrics
-   - Compression algorithm comparison
-
-## 📁 Repository Structure
-
-```
-├── schema/              # Star schema design and documentation
-├── data/                # Raw and processed data files
-├── scripts/             # Data loading and transformation scripts
-├── benchmarks/          # Performance testing results
-└── docs/                # Project documentation and reports
-```
 
 ## 🚀 Getting Started
 
-_Instructions coming soon_
+You can upload `TransferMarkt_ETL_and_Benchmark.ipynb` to Databricks to run the full ETL and benchmarking process. The notebook is structured into sections for easy navigation.
 
-## 📝 License
 
-This project is for educational purposes.
-```
+
+## 📈 Benchmark Results
+
+### 🏆 Winner: Parquet + ZSTD
+
+| Metric | Result |
+|--------|--------|
+| Overall Score | 302.3/100 |
+| Compression Ratio | 5.33x |
+| Space Saved | 81.2% |
+| Storage Size | 50.67 MB (vs 269.9 MB CSV) |
+
+### Top 5 Storage Formats
+
+| Format | Compression | Size (MB) | Compression Ratio | Space Saved |
+|--------|-------------|-----------|-------------------|-------------|
+| Parquet | ZSTD | 50.67 | 5.33x | 81.2% |
+| Parquet | Gzip | 52.56 | 5.14x | 80.5% |
+| Avro | Bzip2 | 62.37 | 4.33x | 76.9% |
+| Parquet | Snappy | 76.13 | 3.55x | 71.8% |
+| Parquet | LZ4 | 79.32 | 3.40x | 70.6% |
+
+### Performance Insights
+
+- **Best Compression**: Parquet + ZSTD (5.33x ratio)
+- **Fastest Write**: Parquet + Snappy (20.77s total)
+- **Fastest Read**: Parquet + ZSTD (0.85s average)
+- **Best Balance**: Parquet + Snappy (general purpose)
+
+### 📸 Visualizations
+
+![Storage Size Comparison](visualizations/storage_comparison.png)
+*Storage size comparison across different formats and compression algorithms*
+
+![Write Performance](visualizations/write_performance.png)
+*Write performance metrics showing throughput and execution time*
+
+![Read Performance](visualizations/read_performance.png)
+*Read performance analysis for full scans and selective queries*
+
+
+## 📚 Resources
+- [Project Reference](https://github.com/ahmedshaaban1999/Data_Engineering_Mentorship/tree/main/level_1/Data_Modeling/projects/ecommerce)
+
+---
+
+Built with ❤️ by Ali Adel - Data Engineer | [LinkedIn](https://www.linkedin.com/in/aliadel01/) 
